@@ -20,9 +20,24 @@ sales_path = Path("data\\sales.csv\\sales.csv")
 
 
 class SalesData(Resource):
-    def post(self):
-        parser = reqparse.RequestParser()
+    def get(self):
+        """GET request for sales data"""
 
+        # reqparse object is deprecated, use Schema from Marshmallow instead...
+        parser = reqparse.RequestParser()
+        parser.add_argument("hierarchy_id")
+        parser.add_argument("city_id")
+        parser.add_argument("start_date")
+        parser.add_argument("end_date")
+        parser.add_argument("volume")
+        args = parser.parse_args()
+
+        # return "..."
+        return f"city_id is {args['city_id']}"
+
+
+# api.com/SalesData
+api.add_resource(SalesData, "/salesdata")
 
 if __name__ == "__main__":
     app.run(debug=True)
