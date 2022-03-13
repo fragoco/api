@@ -27,8 +27,10 @@ sales_df["date"] = pd.to_datetime(sales_df["date"], format="%Y-%m-%d")
 
 class ProdSales(Resource):
     def get(self):
+        """GET request data for product sales quantity and revenue"""
+
         parser = reqparse.RequestParser()
-        parser.add_argument("hierarchy1_id", type=str, required=True)
+        parser.add_argument("hierarchyid", type=str, required=True)
         parser.add_argument("startdate", type=str, required=True)
         parser.add_argument("enddate", type=str, required=True)
         args = parser.parse_args()
@@ -38,44 +40,60 @@ class ProdSales(Resource):
             start=pd.to_datetime(args["startdate"]), end=pd.to_datetime(args["enddate"])
         )
 
-        # pepare filters
-        # filter by user provided dates
-        date_range_filt = sales_df["sales"].isin(date_range)
+        # Prepare filters
+        # Filter by user provided dates
+        date_range_filt = sales_df["date"].isin(date_range)
         # "hierarchy_id" filter applied to "product_id" in prod_df
-        hierarchy_filt = prod_df["hierarchy1_id"] == args["hierarchy1_id"]
-        prod_filt = prod_df.loc[hierarchy_filt]["product_id"]
+        hierarchy_filt = prod_df["hierarchy1_id"] == args["hierarchyid"]
+        # Series created with the matching result of the prod_df "product_id" column filtered by "hierarchy1_id"
+        prod_hierarchy_filt = prod_df.loc[hierarchy_filt]["product_id"]
+        # Filter applied to sales_df "product_id" column
+        prod_filt = sales_df["product_id"].isin(prod_hierarchy_filt)
 
-        # prodsales_filt = date_range_filt & prod_filt
-
-        # return filtered data
-        return sales_df.loc[date_range_filt & prod_filt].agg(
-            {"sales": "sum", "revenue": "sum"}
+        # Return filtered, aggregated data
+        return (
+            sales_df.loc[(date_range_filt & prod_filt)]
+            .agg({"sales": "sum", "revenue": "sum"})
+            .to_dict()
         )
-
-        # return {
-        #     "hierarchy1_id": args["hierarchy1_id"],
-        #     "startdate": args["startdate"],
-        #     "enddate": args["enddate"],
-        # }
 
 
 class CitySales(Resource):
     def get(self):
+        """GET request data for city specific sales quantity and revenue"""
+
         parser = reqparse.RequestParser()
         parser.add_argument("cityid", type=str, required=True)
         parser.add_argument("startdate", type=str, required=True)
         parser.add_argument("enddate", type=str, required=True)
         args = parser.parse_args()
 
-        return {
-            "cityid": args["cityid"],
-            "startdate": args["startdate"],
-            "enddate": args["enddate"],
-        }
+        # Creating date range
+        date_range = pd.date_range(
+            start=pd.to_datetime(args["startdate"]), end=pd.to_datetime(args["enddate"])
+        )
+
+        # Prepare filters
+        #
+        date_range_filt = sales_df["date"].isin(date_range)
+        # city_id filter applied to store_id
+        city_filt = cities_df["city_id"] == args["cityid"]
+        #
+        store_filt = cities_df.loc[city_filt]["store_id"]
+        #
+        store_sales_filt = sales_df["store_id"].isin(store_filt)
+
+        return (
+            sales_df.loc[(date_range_filt & store_sales_filt)]
+            .agg({"sales": "sum", "revenue": "sum"})
+            .to_dict()
+        )
 
 
 class Volume(Resource):
     def get(self):
+        """GET request data for volume sales quantity and stock"""
+
         parser = reqparse.RequestParser()
         parser.add_argument("product_id", type=str, required=True)
         parser.add_argument("startdate", type=str, required=True)
