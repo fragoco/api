@@ -74,7 +74,7 @@ class CitySales(Resource):
         )
 
         # Prepare filters
-        #
+        # Filter by user provided dates
         date_range_filt = sales_df["date"].isin(date_range)
         # city_id filter applied to store_id
         city_filt = cities_df["city_id"] == args["cityid"]
@@ -95,15 +95,40 @@ class Volume(Resource):
         """GET request data for volume sales quantity and stock"""
 
         parser = reqparse.RequestParser()
-        parser.add_argument("product_id", type=str, required=True)
+        parser.add_argument("productid", type=str, required=True)
         parser.add_argument("startdate", type=str, required=True)
         parser.add_argument("enddate", type=str, required=True)
         args = parser.parse_args()
 
+        # Creating date range
+        date_range = pd.date_range(
+            start=pd.to_datetime(args["startdate"]), end=pd.to_datetime(args["enddate"])
+        )
+
+        # Prepare filters
+        # Filter by user provided dates
+        date_range_filt = sales_df["date"].isin(date_range)
+        #
+        sales_prodid = sales_df["product_id"] == args["productid"]
+        #
+        prod_prodid = prod_df["product_id"] == args["productid"]
+
+        # Calculations
+        # Single product volume size
+        prod_vol = (
+            prod_df.loc[prod_prodid]["product_length"]
+            * prod_df.loc[prod_prodid]["product_depth"]
+            * prod_df.loc[prod_prodid]["product_width"]
+        )
+        # Sum of sales quantity and stock quantity during user defined period
+        sales_stock = sales_df.loc[(date_range_filt & sales_prodid)].agg(
+            {"sales": "sum", "stock": "sum"}
+        )
+
+        # Return multiplied results
         return {
-            "product_id": args["product_id"],
-            "startdate": args["startdate"],
-            "enddate": args["enddate"],
+            "Total sales volume": prod_vol[1] * sales_stock[0],
+            "Total stock volume": prod_vol[1] * sales_stock[1:2][0],
         }
 
 
@@ -113,4 +138,4 @@ api.add_resource(CitySales, "/citysales")
 api.add_resource(Volume, "/volume")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
