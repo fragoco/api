@@ -15,7 +15,7 @@ product_path = Path("data\\product_hierarchy.csv")
 # /data/store_cities.csv
 cities_path = Path("data\\store_cities.csv")
 
-# /data/sales.csv/sales.csv
+# /data/sales/sales.csv
 sales_path = Path("data\\sales.csv\\sales.csv")
 
 
