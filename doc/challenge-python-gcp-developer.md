@@ -82,28 +82,29 @@ This data is collected from a Turkish retail company. Time period is beginning f
 
 ### Queries
 
-- View Product sales
+- Total Sales quantity and revenue for Specific product **hierarchy1_id** and specified **date** range. Returns a single row.
   - input
     - hierarchy1_id
     - date
   - output
     - sales
     - revenue
-- View City sales
+- Total Sales quantity and revenue for Specific **city_id** and specified **date** range. Returns a single row.
   - input
     - city_id
     - date
   - output
     - sales
     - revenue
-- Volume data
+- Total **volume** (using provided **product dimensions** multiplied by **quantity**) of a specific **product** for specified **date** range. Returns a single row.
   - input
     - product_id
+    - date
+  - process
     - product_length
     - product_depth
     - product_width
     - sales (quantity?)
-    - date
   - output
     - volume
 - Public Holiday Sales

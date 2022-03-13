@@ -32,8 +32,9 @@ class SalesData(Resource):
         parser.add_argument("volume")
         args = parser.parse_args()
 
+        if not args["start_date"]
         # return "..."
-        return f"city_id is {args['city_id']}"
+        return f"requested city_id {args['city_id']}"
 
 
 # api.com/SalesData
