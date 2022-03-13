@@ -76,13 +76,14 @@ class CitySales(Resource):
         # Prepare filters
         # Filter by user provided dates
         date_range_filt = sales_df["date"].isin(date_range)
-        # city_id filter applied to store_id
+        # User defined "cityid" filter applied to cities_df
         city_filt = cities_df["city_id"] == args["cityid"]
-        #
+        # city_id filter applied to store_id
         store_filt = cities_df.loc[city_filt]["store_id"]
-        #
+        # Filter sales_df with the store_filt series
         store_sales_filt = sales_df["store_id"].isin(store_filt)
 
+        # Return filtered data
         return (
             sales_df.loc[(date_range_filt & store_sales_filt)]
             .agg({"sales": "sum", "revenue": "sum"})
@@ -108,9 +109,9 @@ class Volume(Resource):
         # Prepare filters
         # Filter by user provided dates
         date_range_filt = sales_df["date"].isin(date_range)
-        #
+        # Filter sales_df "product_id" column by user provided "productid"
         sales_prodid = sales_df["product_id"] == args["productid"]
-        #
+        # Filter prod_df "product_id" column by user provided "productid"
         prod_prodid = prod_df["product_id"] == args["productid"]
 
         # Calculations
