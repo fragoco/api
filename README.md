@@ -5,7 +5,8 @@
 The datasets have been downloaded and placed in the `\data` folder:  
 `\data\product_hierarchy.csv`  
 `\data\store_cities.csv`  
-`\data\sales\sales.csv`
+`\data\sales\sales.csv`  
+Please note the folder name-change from \sales.csv to \sales
 
 Install the necessary libraries using pip  
 `pip install -r requirements.txt`
